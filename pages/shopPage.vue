@@ -4,7 +4,6 @@
       class=""
       color="#EF3B36"
       absolute
-      dark
       shrink-on-scroll
       :min-height="82"
       :src="require('~/assets/storepork.jpg')"
@@ -31,17 +30,45 @@
 
         <v-spacer></v-spacer>
 
-        <v-col cols="3" class="d-flex justify-end align-center">
-          <v-badge
-            :content="messages"
-            :value="messages"
-            color="red"
-            overlap
-            class="mr-5"
+        <v-col cols="3" class="d-flex justify-end align-center pst">
+          <v-btn @click.stop="dialogBill = !dialogBill" color="red">
+            <v-badge
+              :content="cartData.length"
+              :value="cartData.length"
+              color="red"
+              overlap
+              class=""
+            >
+              <v-icon large> mdi-cart-outline </v-icon>
+            </v-badge></v-btn
           >
-            <v-icon large> mdi-cart-outline </v-icon>
-          </v-badge>
         </v-col>
+        <v-card width="350px" class="zindex" v-if="dialogBill ? true : false" rounded="xl" elevation="15">
+          <v-card-title>
+            <v-row>
+              <v-col cols="3" class="body-2">รายการ</v-col>
+              <v-col cols="3" class="body-2">จำนวน</v-col>
+              <v-col cols="3" class="body-2">ราคา</v-col>
+              <v-col cols="3" class="body-2">รวม</v-col>
+            </v-row>
+          </v-card-title>
+          <v-card-text v-for="(item, index) in cartData" :key="index">
+            <v-row>
+              <v-col cols="3"> {{ item.NAME }} </v-col>
+              <v-col cols="3"> {{ item.TOTAL }} </v-col>
+              <v-col cols="3"> {{ item.PRICE }} </v-col>
+              <v-col cols="3"> {{ item.SUMMARY }} </v-col>
+            </v-row>
+          </v-card-text>
+          <v-card-text>
+            <v-row>
+              <v-col cols="3">ยอดรวม</v-col>
+              <v-col cols="3"></v-col>
+              <v-col cols="3"></v-col>
+              <v-col cols="3">{{ totalSummary }}</v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
 
         <v-col
           cols="3"
@@ -76,81 +103,69 @@
               <v-row>
                 <v-col
                   cols="12"
-                  md="3"
+                  md="6"
                   lg="3"
                   v-for="(item, index) in allProduct"
                   :key="index"
                 >
-                  <v-hover v-slot="{ hover }">
-                    <v-card
-                      rounded="xl"
-                      elevation="10"
-                      class="px-5"
-                      :class="{ 'on-hover': hover }"
-                    >
-                      <v-card-title class="justify-center">
-                        {{ item.NAME }}
-                      </v-card-title>
-                      <v-card-text class="pa-2">
-                        <v-row>
-                          <v-col cols="12" class="">
-                            <v-img
-                              :src="item.FILELINK"
-                              width="200px"
-                              height="100px"
-                              class="mx-auto rounded-xl"
-                            />
-                          </v-col>
-                          <v-col cols="5" class="" v-if="item.PROMOTION === 0">
-                            <h4>ราคา {{ item.PRICE }} บาท</h4>
-                          </v-col>
-                          <v-col cols="5" class="" v-else>
-                            <h4 class="text-line">ราคา {{ item.PRICE }} บาท</h4>
-                          </v-col>
-                          <v-col cols="7" class="" v-if="item.PROMOTION === 1">
-                            <h4>Promotion {{ item.PROMOTION_PRICE }} บาท</h4>
-                          </v-col>
-                          <v-col cols="7" class="" v-else> </v-col>
-                          <v-col cols="6"><h4>จำนวน</h4></v-col>
-                          <v-col cols="6" class="text-end"
-                            ><h4 class="pr-3">{{ item.TOTAL }} แพค</h4></v-col
-                          >
-                          <v-card-actions>
-                            <v-row no-gutters class="mb-5">
-                              <v-col
-                                cols="4"
-                                class="d-flex justify-center align-center"
-                              >
-                                <v-btn rounded>
-                                  <v-icon @click="minusTotal">mdi-minus</v-icon>
-                                </v-btn>
-                              </v-col>
-                              <v-col cols="4" class="pt-1">
-                                <v-text-field
-                                  v-model="total[index]"
-                                  rounded
-                                  dense
-                                  type="number"
-                                  outlined
-                                  hide-details
-                                ></v-text-field>
-                              </v-col>
-                              <v-col
-                                cols="4"
-                                class="d-flex justify-center align-center"
-                              >
-                                <v-btn rounded>
-                                  <v-icon @click="plusTotal(index)"
-                                    >mdi-plus</v-icon
-                                  >
-                                </v-btn>
-                              </v-col>
-                            </v-row>
-                          </v-card-actions>
-                        </v-row>
-                      </v-card-text>
-                    </v-card>
-                  </v-hover>
+                  <v-card rounded="xl" elevation="10" class="px-5">
+                    <v-card-title class="justify-center">
+                      {{ item.NAME }}
+                    </v-card-title>
+                    <v-card-text class="pa-2">
+                      <v-row>
+                        <v-col cols="12" class="">
+                          <v-img
+                            :src="item.FILELINK"
+                            width="200px"
+                            height="100px"
+                            class="mx-auto rounded-xl"
+                          />
+                        </v-col>
+                        <v-col cols="5" class="" v-if="item.PROMOTION === 0">
+                          <h4>ราคา {{ item.PRICE }} บาท</h4>
+                        </v-col>
+                        <v-col cols="5" class="" v-else>
+                          <h4 class="text-line">ราคา {{ item.PRICE }} บาท</h4>
+                        </v-col>
+                        <v-col
+                          cols="7"
+                          class="text-right"
+                          v-if="item.PROMOTION === 1"
+                        >
+                          <h4>Promotion {{ item.PROMOTION_PRICE }} บาท</h4>
+                        </v-col>
+                        <v-col cols="7" class="" v-else> </v-col>
+                        <v-col cols="6"><h4>จำนวน</h4></v-col>
+                        <v-col cols="6" class="text-end"
+                          ><h4 class="pr-3">{{ item.TOTAL }} แพค</h4></v-col
+                        >
+
+                        <v-col cols="12" class="pt-1">
+                          <v-text-field
+                            v-model="total[index]"
+                            rounded
+                            dense
+                            type="number"
+                            outlined
+                            :min="0"
+                            :rules="[
+                              (v) =>
+                                v <= item.TOTAL ||
+                                'ใส่จำนวนสินค้าไม่เกินที่มีอยู่',
+                            ]"
+                          ></v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" class="text-center">
+                          <v-btn rounded @click="addCart(item, index)" block>
+                            <v-icon></v-icon>
+                            เพิ่มลงตะกร้า
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-card-text>
+                  </v-card>
                 </v-col>
               </v-row>
             </v-col>
@@ -196,7 +211,7 @@ import { mapActions } from 'vuex'
 export default {
   data() {
     return {
-      transparent: 'rgba(255, 255, 255, 0)',
+      dialogBill: false,
       drawer: null,
       items: [
         { title: 'หน้าหลัก', icon: 'mdi-home' },
@@ -204,12 +219,35 @@ export default {
         { title: 'ราคาหมูวันนี้', icon: 'mdi-shopping' },
         { title: 'สั่งซื้อ', icon: 'mdi-cart', link: '/shopPage' },
       ],
+      headers: [
+        {
+          text: 'รายการ',
+          value: 'NAME',
+          align: 'left',
+        },
+        {
+          text: 'จำนวน',
+          value: 'TOTAL',
+          align: 'left',
+        },
+        {
+          text: 'ราคา',
+          value: 'TOTAL',
+          align: 'left',
+        },
+        {
+          text: 'จำนวน x ราคา',
+          value: 'SUMMARY',
+          align: 'left',
+        },
+      ],
       messages: null,
       cartData: [],
       allProduct: [],
-      total: []
+      total: [],
     }
   },
+
   created() {
     this.callAllProduct()
   },
@@ -230,15 +268,49 @@ export default {
       this.allProduct = await this.listProduct()
       console.log(this.allProduct)
     },
-    minusTotal() {
-      if (this.total > 0) {
-        this.total -= 1
+
+    addCart(item, index) {
+      console.log(item)
+      if (
+        this.total[index] === null ||
+        this.total[index] === undefined ||
+        this.total[index] === ''
+      ) {
+        this.$swal({
+          icon: 'warning',
+          title: 'ใส่จำนวนสินค้า',
+        })
+      } else if (this.total[index] > item.TOTAL) {
+        this.$swal({
+          icon: 'warning',
+          title: 'ใส่จำนวนสินค้าใหม่',
+          text: 'จำนวนที่เลือกมากกว่าสินค้าที่มี',
+        })
+      } else if (item.PROMOTION === 1) {
+        this.cartData.push({
+          INDEX: index,
+          NAME: item.NAME,
+          DETAIL: item.DETAIL,
+          PRICE: item.PROMOTION_PRICE,
+          TOTAL: this.total[index],
+          SUMMARY: item.PROMOTION_PRICE * this.total[index],
+        })
+      } else {
+        this.cartData.push({
+          INDEX: index,
+          NAME: item.NAME,
+          DETAIL: item.DETAIL,
+          PRICE: item.PRICE,
+          TOTAL: this.total[index],
+          SUMMARY: item.PRICE * this.total[index],
+        })
       }
+
+      console.log(this.cartData)
+      this.total[index] = null
     },
-    plusTotal(index) {
-      // Increment the value by 1
-      this.total[index]++
-      console.log(this.total)
+    openBill() {
+      console.log(this.dialogBill)
     },
   },
   computed: {
@@ -266,36 +338,19 @@ export default {
       }
       return `${fonSize}px`
     },
+    totalSummary() {
+      // Loop through cartData and sum up item.SUMMARY values
+      return this.cartData.reduce((total, item) => total + item.SUMMARY, 0)
+    },
   },
 }
 </script>
 
 <style scoped>
-.bg {
-  background-color: aquamarine;
-}
-.v-card {
-  transition: opacity 0.2s ease-in-out;
-}
-
-.v-card:not(.on-hover) {
-  opacity: 0.9;
-}
-
-.show-btns {
-  color: rgba(255, 255, 255, 1) !important;
-}
 .text-color {
   text-align: center;
   color: white !important;
   font-weight: 700 !important;
-}
-.bg-hover:hover {
-  height: 55px !important;
-  /* width: 150px !important; */
-  background-color: rgb(83, 83, 83, 0.7);
-  transition-duration: 1s !important;
-  border-radius: 20px !important;
 }
 .carousel-text {
   position: absolute;
@@ -312,5 +367,28 @@ export default {
 .bg {
   background: linear-gradient(111deg, #200122, #6f0000);
   background-size: 120% 120%;
+  animation: gradient-animation 3s ease infinite;
+}
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.pst {
+  z-index: 10000 !important;
+  position: relative !important;
+}
+.zindex {
+  margin-right: 17px !important;
+  top: 48% !important;
+  right: 0 !important;
+  position: absolute !important;
+  z-index: 99999 !important;
 }
 </style>

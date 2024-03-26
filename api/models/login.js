@@ -7,7 +7,6 @@ class login {
 
   static selectUser(USERNAME) {
     const query = `SELECT * FROM USERS WHERE USERNAME =  '${USERNAME}'`
-    console.log(query);
     return sqlcmd(query)
   }
 }
